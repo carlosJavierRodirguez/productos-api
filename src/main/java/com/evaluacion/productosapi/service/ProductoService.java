@@ -1,8 +1,10 @@
 package com.evaluacion.productosapi.service;
 
+import com.evaluacion.productosapi.entity.Categoria;
 import com.evaluacion.productosapi.entity.Producto;
 import com.evaluacion.productosapi.repository.ProductoRepository;
 import com.evaluacion.productosapi.service.exception.ProductoNoEncontradoException;
+import com.evaluacion.productosapi.service.exception.ProductoYaExisteException;
 import com.evaluacion.productosapi.service.exception.StockInsuficienteException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -28,6 +30,9 @@ public class ProductoService {
     }
 
     public Producto crear(Producto producto) {
+        if (!productoRepository.findByNombre(producto.getNombre()).isEmpty()) {
+            throw new ProductoYaExisteException(producto.getNombre());
+        }
         producto.setId(null);
         return productoRepository.save(producto);
     }
@@ -37,6 +42,8 @@ public class ProductoService {
         existente.setNombre(productoActualizado.getNombre());
         existente.setPrecio(productoActualizado.getPrecio());
         existente.setCantidadDisponible(productoActualizado.getCantidadDisponible());
+        existente.setCategoria(productoActualizado.getCategoria());
+        existente.setDescripcion(productoActualizado.getDescripcion());
         return productoRepository.save(existente);
     }
 
@@ -61,5 +68,9 @@ public class ProductoService {
         producto.setCantidadDisponible(disponible - cantidad);
         // gracias a @Transactional y JPA, el cambio se persiste automáticamente
         return producto;
+    }
+
+    public List<Producto> buscarPorCategoria(Categoria categoria) {
+        return productoRepository.findByCategoria(categoria);
     }
 }

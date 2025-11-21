@@ -11,7 +11,7 @@ import lombok.Data;
 import java.math.BigDecimal;
 
 @Data
-public class DtoCreateProduct {
+public class DtoCrearProducto {
 
     @NotBlank(message = "El nombre es obligatorio")
     private String nombre;
